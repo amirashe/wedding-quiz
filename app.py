@@ -177,6 +177,15 @@ def resume_game():
         return jsonify(response)
 
 
+@app.route("/api/admin/reset", methods=["POST"])
+def reset_scores():
+    with get_db() as conn:
+        conn.execute("DELETE FROM players")
+        conn.commit()
+    socketio.emit("leaderboard_update", [])
+    return jsonify({"ok": True})
+
+
 @app.route("/api/leaderboard")
 def leaderboard_api():
     with get_db() as conn:
