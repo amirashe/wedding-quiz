@@ -2,11 +2,11 @@
    Global reset & vars
 ════════════════════════════════════════ */
 :root {
-  --pink:        #e84393;
-  --pink-light:  #ff6fb8;
-  --bg-a:        #ffd6e7;
-  --bg-b:        #c8b6ff;
-  --bg-c:        #b8d3fe;
+  --pink:        #22c55e;
+  --pink-light:  #4ade80;
+  --bg-a:        #d4f5e9;
+  --bg-b:        #a8edca;
+  --bg-c:        #b8f0d8;
   --white:       #ffffff;
   --dark:        #1e1e2e;
   --mid:         #64658a;
@@ -155,7 +155,7 @@ body {
   border: none;
   border-radius: 14px;
   cursor: pointer;
-  box-shadow: 0 6px 20px rgba(232,67,147,.35);
+  box-shadow: 0 6px 20px rgba(34,197,94,.35);
   transition: transform .15s var(--ease), box-shadow .15s var(--ease), opacity .15s;
 }
 .btn-primary:active { transform: scale(.97); box-shadow: none; }
@@ -395,7 +395,7 @@ body {
   font-size: 22px;
   border: none;
   cursor: pointer;
-  box-shadow: 0 6px 20px rgba(232,67,147,.4);
+  box-shadow: 0 6px 20px rgba(34,197,94,.4);
   display: none;
   align-items: center;
   justify-content: center;
