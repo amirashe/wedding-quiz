@@ -115,7 +115,6 @@ async function selectAnswer(idx, btn) {
   if (answering) return;
   answering = true;
 
-  btn.classList.add("selected");
   document.querySelectorAll(".option-btn").forEach(b => b.classList.add("locked"));
 
   try {
@@ -123,9 +122,23 @@ async function selectAnswer(idx, btn) {
     const data = await res.json();
 
     score = data.score;
-    updateScoreChip(score);
 
-    await sleep(380);   // brief pause so tap feedback is visible
+    // Show correct / wrong feedback
+    const buttons = document.querySelectorAll(".option-btn");
+    buttons[data.correct_index].classList.add("correct");
+
+    if (data.correct) {
+      btn.classList.add("correct");
+      launchConfetti();
+    } else {
+      btn.classList.add("wrong");
+      document.getElementById("question-card").classList.add("shake-card");
+    }
+
+    updateScoreChip(score);
+    await sleep(1200);
+
+    document.getElementById("question-card").classList.remove("shake-card");
 
     if (data.finished) {
       localStorage.removeItem("wedding_token");
@@ -142,6 +155,30 @@ async function selectAnswer(idx, btn) {
     showError("שגיאה בשליחת התשובה");
   } finally {
     answering = false;
+  }
+}
+
+// ──────────────────────────────────────────
+//  Confetti
+// ──────────────────────────────────────────
+function launchConfetti() {
+  const colors = ["#e84393","#ffd700","#4ecdc4","#a29bfe","#ff6b9d","#ffb300"];
+  const container = document.getElementById("question-card");
+  const rect = container.getBoundingClientRect();
+
+  for (let i = 0; i < 28; i++) {
+    const dot = document.createElement("div");
+    dot.className = "confetti-dot";
+    dot.style.cssText = `
+      left:${Math.random() * rect.width}px;
+      background:${colors[Math.floor(Math.random() * colors.length)]};
+      animation-delay:${Math.random() * 0.3}s;
+      width:${6 + Math.random() * 6}px;
+      height:${6 + Math.random() * 6}px;
+      border-radius:${Math.random() > 0.5 ? "50%" : "2px"};
+    `;
+    container.appendChild(dot);
+    dot.addEventListener("animationend", () => dot.remove());
   }
 }
 
