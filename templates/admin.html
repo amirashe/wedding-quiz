@@ -102,20 +102,11 @@
 
 <!-- QR Generator -->
 <div class="card">
-  <h2>📱 יצירת קוד QR לאורחים</h2>
-  <div class="instructions">
-    <strong>איך מקבלים כתובת ציבורית לאורחים?</strong><br>
-    1. פתח טרמינל חדש<br>
-    2. הרץ: <code>./venv/bin/ngrok http 5000</code><br>
-    3. העתק את הכתובת שמופיעה (כמו <em>https://xxxx.ngrok-free.app</em>)<br>
-    4. הדבק כאן ↓
-  </div>
-  <br>
-  <label>הדבק כאן את כתובת ה-ngrok (או כל כתובת ציבורית)</label>
-  <input type="text" id="url-input" placeholder="https://xxxx.ngrok-free.app" oninput="generateQR()">
-  <div id="qr-container">
-    <img id="qr-img" src="" alt="QR Code">
-    <p id="qr-url-text"></p>
+  <h2>📱 QR Code for Guests</h2>
+  <p style="color:#888;font-size:14px;margin-bottom:16px;">Guests scan this to play:</p>
+  <div style="text-align:center;">
+    <img id="qr-img" src="" alt="QR Code" style="border-radius:12px;border:4px solid #f3f3f3;max-width:220px;">
+    <p id="qr-url-text" style="font-size:13px;color:#777;margin-top:10px;word-break:break-all;"></p>
   </div>
 </div>
 
@@ -138,16 +129,12 @@
 
 <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 <script>
-  function generateQR() {
-    const url = document.getElementById('url-input').value.trim();
-    const container = document.getElementById('qr-container');
-    if (!url) { container.style.display = 'none'; return; }
-    const encoded = encodeURIComponent(url);
-    document.getElementById('qr-img').src =
-      `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encoded}&margin=10`;
-    document.getElementById('qr-url-text').textContent = url;
-    container.style.display = 'block';
-  }
+  // Auto-generate QR for current domain
+  const appUrl = window.location.origin;
+  const encoded = encodeURIComponent(appUrl);
+  document.getElementById('qr-img').src =
+    `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encoded}&margin=10`;
+  document.getElementById('qr-url-text').textContent = appUrl;
 
   const medals = ['🥇','🥈','🥉'];
 
