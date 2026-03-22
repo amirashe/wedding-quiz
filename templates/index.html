@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#f472b6">
+  <title>מי מכיר את מעיין ואמיר הכי טוב? 💍</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<div class="app-wrap">
+
+  <!-- ══════════════════════════════════════
+       מסך פתיחה
+  ═══════════════════════════════════════ -->
+  <div id="screen-start" class="screen active">
+    <div class="card start-card">
+      <div class="ring-emoji">💍</div>
+      <h1 class="game-title">
+        מי מכיר את<br>
+        <span class="couple-names">מעיין ואמיר</span><br>
+        הכי טוב?
+      </h1>
+      <p class="subtitle">ענה על {{ total_questions }} שאלות וגלה מי האלוף! 🏆</p>
+      <div class="input-wrap">
+        <input
+          type="text"
+          id="player-name"
+          placeholder="הכנס את שמך"
+          maxlength="30"
+          autocomplete="off"
+          autocorrect="off"
+        >
+      </div>
+      <button id="start-btn" class="btn btn-primary" onclick="startGame()">
+        בוא נתחיל! 🎉
+      </button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       מסך שאלות
+  ═══════════════════════════════════════ -->
+  <div id="screen-question" class="screen">
+
+    <div class="q-header">
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+      <div class="q-meta">
+        <span id="q-counter">שאלה 1 מתוך {{ total_questions }}</span>
+        <span id="q-score" class="q-score-chip">0 נקודות</span>
+      </div>
+    </div>
+
+    <div class="card question-card" id="question-card">
+      <p class="question-text" id="question-text">טוען...</p>
+      <div class="options-grid" id="options-grid"></div>
+    </div>
+
+  </div>
+
+  <!-- ══════════════════════════════════════
+       מסך סיום
+  ═══════════════════════════════════════ -->
+  <div id="screen-end" class="screen">
+
+    <div class="card end-card">
+      <div class="end-emoji" id="end-emoji">🎉</div>
+      <h2 class="end-title" id="end-title">כל הכבוד!</h2>
+      <div class="score-bubble">
+        <span class="score-num" id="final-score">0</span>
+        <span class="score-lbl">נקודות</span>
+      </div>
+      <p class="end-msg" id="end-msg"></p>
+    </div>
+
+    <div class="board-section">
+      <h3 class="board-heading">🏆 לוח המובילים</h3>
+      <div class="board-live" id="board-live">
+        <div class="board-loading">טוען...</div>
+      </div>
+    </div>
+
+  </div>
+
+</div><!-- /app-wrap -->
+
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<script>const TOTAL_Q = {{ total_questions }};</script>
+<script src="/static/js/app.js"></script>
+</body>
+</html>

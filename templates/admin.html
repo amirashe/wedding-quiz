@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ניהול - חתונת מעיין ואמיר</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Rubik', sans-serif;
+      direction: rtl;
+      background: linear-gradient(160deg, #ffd6e7 0%, #c8b6ff 50%, #b8d3fe 100%);
+      min-height: 100vh;
+      padding: 24px 16px 40px;
+      color: #1e1e2e;
+    }
+    h1 {
+      font-size: 26px; font-weight: 900;
+      text-align: center; margin-bottom: 6px;
+    }
+    .sub { text-align: center; color: #555; margin-bottom: 28px; font-size: 15px; }
+    .card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 8px 32px rgba(0,0,0,.12);
+      margin-bottom: 20px;
+      max-width: 580px;
+      margin-left: auto; margin-right: auto;
+    }
+    .card h2 { font-size: 18px; font-weight: 700; margin-bottom: 14px; }
+    label { display: block; font-size: 14px; color: #555; margin-bottom: 6px; }
+    input[type=text] {
+      width: 100%; padding: 14px 16px;
+      font-size: 15px; font-family: 'Rubik', sans-serif;
+      border: 2px solid #e0e0e0; border-radius: 12px;
+      direction: ltr; text-align: left;
+      outline: none; transition: border .2s;
+    }
+    input[type=text]:focus { border-color: #e84393; }
+    .btn {
+      display: block; width: 100%; margin-top: 14px;
+      padding: 14px; font-size: 17px; font-weight: 700;
+      font-family: 'Rubik', sans-serif;
+      background: linear-gradient(135deg, #e84393, #ff6fb8);
+      color: #fff; border: none; border-radius: 12px;
+      cursor: pointer; transition: opacity .2s;
+    }
+    .btn:hover { opacity: .9; }
+
+    #qr-container {
+      text-align: center; margin-top: 18px;
+      display: none;
+    }
+    #qr-container img {
+      border-radius: 12px;
+      border: 4px solid #f3f3f3;
+      max-width: 220px;
+    }
+    #qr-url-text {
+      font-size: 13px; color: #777; margin-top: 8px;
+      word-break: break-all;
+    }
+
+    /* Leaderboard */
+    .board-item {
+      display: flex; align-items: center;
+      padding: 12px 16px;
+      border-bottom: 1px solid #f5f5f5;
+    }
+    .board-item:last-child { border-bottom: none; }
+    .board-item.r1 { background: linear-gradient(90deg,#fff8dc,#fff); }
+    .board-item.r2 { background: linear-gradient(90deg,#f0f0f0,#fff); }
+    .board-item.r3 { background: linear-gradient(90deg,#fff0e6,#fff); }
+    .rank { font-size: 22px; width: 36px; flex-shrink: 0; margin-left: 12px; }
+    .pname { flex: 1; font-size: 16px; font-weight: 600; }
+    .pscore { font-size: 18px; font-weight: 800; color: #e84393; }
+    .board-empty { padding: 20px; text-align: center; color: #aaa; font-size: 15px; }
+
+    .instructions {
+      background: #fffbeb; border: 1px solid #fde68a;
+      border-radius: 12px; padding: 16px; font-size: 14px;
+      line-height: 1.7; color: #555;
+    }
+    .instructions code {
+      background: #1e1e2e; color: #a6e22e;
+      padding: 2px 8px; border-radius: 6px; font-size: 13px;
+    }
+    .status-dot {
+      display: inline-block; width: 10px; height: 10px;
+      border-radius: 50%; background: #22c55e;
+      margin-left: 6px; vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+
+<h1>⚙️ עמוד ניהול</h1>
+<p class="sub">חתונת מעיין ואמיר 💍 <span class="status-dot"></span> השרת פועל</p>
+
+<!-- QR Generator -->
+<div class="card">
+  <h2>📱 יצירת קוד QR לאורחים</h2>
+  <div class="instructions">
+    <strong>איך מקבלים כתובת ציבורית לאורחים?</strong><br>
+    1. פתח טרמינל חדש<br>
+    2. הרץ: <code>./venv/bin/ngrok http 5000</code><br>
+    3. העתק את הכתובת שמופיעה (כמו <em>https://xxxx.ngrok-free.app</em>)<br>
+    4. הדבק כאן ↓
+  </div>
+  <br>
+  <label>הדבק כאן את כתובת ה-ngrok (או כל כתובת ציבורית)</label>
+  <input type="text" id="url-input" placeholder="https://xxxx.ngrok-free.app" oninput="generateQR()">
+  <div id="qr-container">
+    <img id="qr-img" src="" alt="QR Code">
+    <p id="qr-url-text"></p>
+  </div>
+</div>
+
+<!-- Live Leaderboard -->
+<div class="card">
+  <h2>🏆 לוח מובילים (חי)</h2>
+  <div id="board-admin">
+    <div class="board-empty">אין שחקנים עדיין</div>
+  </div>
+</div>
+
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<script>
+  function generateQR() {
+    const url = document.getElementById('url-input').value.trim();
+    const container = document.getElementById('qr-container');
+    if (!url) { container.style.display = 'none'; return; }
+    const encoded = encodeURIComponent(url);
+    document.getElementById('qr-img').src =
+      `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encoded}&margin=10`;
+    document.getElementById('qr-url-text').textContent = url;
+    container.style.display = 'block';
+  }
+
+  const medals = ['🥇','🥈','🥉'];
+
+  function renderBoard(players) {
+    const el = document.getElementById('board-admin');
+    if (!players || players.length === 0) {
+      el.innerHTML = '<div class="board-empty">אין שחקנים עדיין</div>';
+      return;
+    }
+    el.innerHTML = players.map((p, i) => `
+      <div class="board-item r${i+1}">
+        <div class="rank">${medals[i] || (i+1)}</div>
+        <div class="pname">${esc(p.name)}</div>
+        <div class="pscore">${p.score}</div>
+      </div>
+    `).join('');
+  }
+
+  function esc(s) {
+    const d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  const socket = io();
+  socket.on('leaderboard_update', renderBoard);
+  socket.on('connect', () => socket.emit('request_leaderboard'));
+</script>
+</body>
+</html>
