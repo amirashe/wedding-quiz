@@ -89,6 +89,18 @@
 
 </div><!-- /app-wrap -->
 
+<!-- Floating leaderboard button -->
+<button class="fab-board" id="fab-board" onclick="openBoard()">🏆</button>
+
+<!-- Leaderboard overlay -->
+<div class="board-overlay" id="board-overlay" onclick="closeBoard(event)">
+  <div class="board-sheet">
+    <div class="board-sheet-title">🏆 לוח המובילים</div>
+    <div id="board-sheet-list"></div>
+    <button class="board-close" onclick="closeBoard()">סגור</button>
+  </div>
+</div>
+
 <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 <script>const TOTAL_Q = {{ total_questions }};</script>
 <script src="/static/js/app.js"></script>

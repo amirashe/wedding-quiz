@@ -30,6 +30,7 @@ socket.on("leaderboard_update", data => {
   if (document.getElementById("screen-end").classList.contains("active")) {
     renderBoard(data);
   }
+  renderBoardSheet(data);
 });
 
 // ──────────────────────────────────────────
@@ -269,6 +270,37 @@ function showScreen(id) {
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
   window.scrollTo(0, 0);
+
+  // Show FAB only during question screen
+  const fab = document.getElementById("fab-board");
+  fab.classList.toggle("visible", id === "screen-question");
+}
+
+function openBoard() {
+  socket.emit("request_leaderboard");
+  document.getElementById("board-overlay").classList.add("open");
+}
+
+function closeBoard(e) {
+  if (e && e.target !== document.getElementById("board-overlay")) return;
+  document.getElementById("board-overlay").classList.remove("open");
+}
+
+function renderBoardSheet(players) {
+  const el = document.getElementById("board-sheet-list");
+  if (!el) return;
+  if (!players || players.length === 0) {
+    el.innerHTML = '<div class="board-loading">אין שחקנים עדיין</div>';
+    return;
+  }
+  const medals = ["🥇","🥈","🥉"];
+  el.innerHTML = players.map((p, i) => `
+    <div class="board-item r${i+1}">
+      <div class="board-rank">${medals[i] || (i+1)}</div>
+      <div class="board-name">${esc(p.name)}</div>
+      <div class="board-score">${p.score}</div>
+    </div>
+  `).join("");
 }
 
 function showError(msg) {
