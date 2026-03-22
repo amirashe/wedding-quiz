@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify
 from flask_socketio import SocketIO, emit
 import sqlite3
 import secrets
+import random
 import os
 
 from questions import QUESTIONS
@@ -50,14 +51,44 @@ def leaderboard_data(conn):
     ]
 
 
-def question_payload(idx):
-    q = QUESTIONS[idx]
+def get_question_order(token):
+    """Deterministic shuffle of question indices based on player token."""
+    rng = random.Random(token)
+    indices = list(range(len(QUESTIONS)))
+    rng.shuffle(indices)
+    return indices
+
+
+def question_payload(position, token):
+    """Return question at position (in player's shuffled order), with shuffled options."""
+    real_idx = get_question_order(token)[position]
+    q = QUESTIONS[real_idx]
+
+    # Shuffle options deterministically per player+position
+    rng = random.Random(token + str(position))
+    option_order = list(range(len(q["options"])))
+    rng.shuffle(option_order)
+
+    shuffled_options = [q["options"][i] for i in option_order]
+    new_correct = option_order.index(q["correct"])
+
     return {
-        "index": idx,
-        "text":  q["question"],
-        "options": q["options"],
-        "total": len(QUESTIONS),
+        "index":   position,
+        "text":    q["question"],
+        "options": shuffled_options,
+        "total":   len(QUESTIONS),
+        "_correct": new_correct,   # used server-side only
     }
+
+
+def get_correct_index(position, token):
+    """Recalculate correct answer index for a given position and token."""
+    real_idx = get_question_order(token)[position]
+    q = QUESTIONS[real_idx]
+    rng = random.Random(token + str(position))
+    option_order = list(range(len(q["options"])))
+    rng.shuffle(option_order)
+    return option_order.index(q["correct"])
 
 
 # ── Routes ───────────────────────────────────────────────────────────────────
@@ -89,7 +120,7 @@ def start_game():
 
     return jsonify({
         "token": token,
-        "question": question_payload(0),
+        "question": question_payload(0, token),
     })
 
 
@@ -117,11 +148,11 @@ def submit_answer():
         if q_idx >= len(QUESTIONS):
             return jsonify({"error": "אין שאלות"}), 400
 
-        question   = QUESTIONS[q_idx]
-        is_correct = (int(answer_index) == question["correct"])
-        new_score  = player["score"] + (10 if is_correct else 0)
-        next_idx   = q_idx + 1
-        finished   = 1 if next_idx >= len(QUESTIONS) else 0
+        correct_idx = get_correct_index(q_idx, token)
+        is_correct  = (int(answer_index) == correct_idx)
+        new_score   = player["score"] + (10 if is_correct else 0)
+        next_idx    = q_idx + 1
+        finished    = 1 if next_idx >= len(QUESTIONS) else 0
 
         conn.execute(
             "UPDATE players SET score=?, current_question=?, finished=? WHERE token=?",
@@ -131,13 +162,13 @@ def submit_answer():
 
         response = {
             "correct":       is_correct,
-            "correct_index": question["correct"],
+            "correct_index": correct_idx,
             "score":         new_score,
             "finished":      bool(finished),
         }
 
         if not finished:
-            response["question"] = question_payload(next_idx)
+            response["question"] = question_payload(next_idx, token)
         else:
             board = leaderboard_data(conn)
             socketio.emit("leaderboard_update", board)
@@ -172,7 +203,7 @@ def resume_game():
         else:
             q_idx = player["current_question"]
             if q_idx < len(QUESTIONS):
-                response["question"] = question_payload(q_idx)
+                response["question"] = question_payload(q_idx, token)
 
         return jsonify(response)
 

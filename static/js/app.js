@@ -31,6 +31,7 @@ socket.on("leaderboard_update", data => {
     renderBoard(data);
   }
   renderBoardSheet(data);
+  renderBoardStart(data);
 });
 
 // ──────────────────────────────────────────
@@ -284,6 +285,23 @@ function openBoard() {
 function closeBoard(e) {
   if (e && e.target !== document.getElementById("board-overlay")) return;
   document.getElementById("board-overlay").classList.remove("open");
+}
+
+function renderBoardStart(players) {
+  const el = document.getElementById("board-start");
+  if (!el) return;
+  if (!players || players.length === 0) {
+    el.innerHTML = '<div class="board-loading">אין שחקנים עדיין</div>';
+    return;
+  }
+  const medals = ["🥇","🥈","🥉"];
+  el.innerHTML = players.map((p, i) => `
+    <div class="board-item r${i+1}">
+      <div class="board-rank">${medals[i] || (i+1)}</div>
+      <div class="board-name">${esc(p.name)}</div>
+      <div class="board-score">${p.score}</div>
+    </div>
+  `).join("");
 }
 
 function renderBoardSheet(players) {
