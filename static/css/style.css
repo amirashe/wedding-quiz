@@ -35,6 +35,34 @@ body {
   color: var(--dark);
   -webkit-tap-highlight-color: transparent;
   -webkit-font-smoothing: antialiased;
+  position: relative;
+  overflow: hidden;
+}
+
+body::before {
+  content: '?  ❓  ?  ❓  ?  ?  ❓❓  ?  ?  ❓  ?  ❓  ?  ?  ❓  ?  ❓❓  ?  ❓  ?  ?  ❓  ?  ❓  ?  ?  ❓❓  ?';
+  position: absolute;
+  inset: -55px;
+  font-size: 58px;
+  font-weight: 700;
+  opacity: 0.14;
+  color: #16a34a;
+  word-spacing: 43px;
+  line-height: 2.15;
+  transform: rotate(-8deg);
+  pointer-events: none;
+}
+
+body::after {
+  content: '❓  ?  ?  ❓  ?  ❓  ?  ?  ❓❓  ?  ❓  ?  ?  ❓  ?  ❓  ?  ?  ❓';
+  position: absolute;
+  inset: 5px;
+  font-size: 42px;
+  opacity: 0.12;
+  word-spacing: 36px;
+  line-height: 2.5;
+  transform: rotate(12deg);
+  pointer-events: none;
 }
 
 /* ════════════════════════════════════════
@@ -352,7 +380,7 @@ body {
   opacity: 1 !important;
 }
 .option-btn.wrong {
-  background: #ef4444 !important;
+  background: #047857 !important;
   color: #fff !important;
   opacity: 1 !important;
   animation: wrongShake .4s var(--ease);
