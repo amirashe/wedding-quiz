@@ -335,6 +335,8 @@ body::after {
   border-radius: var(--r);
   box-shadow: var(--shadow);
   overflow: hidden;
+  position: relative;
+  z-index: 1;
 }
 
 .board-item {
