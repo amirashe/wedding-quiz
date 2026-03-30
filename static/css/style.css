@@ -103,6 +103,8 @@ body::after {
   padding: 26px 22px;
   box-shadow: var(--shadow);
   width: 100%;
+  position: relative;
+  z-index: 1;
 }
 
 /* ════════════════════════════════════════
