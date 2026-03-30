@@ -110,6 +110,14 @@
   </div>
 </div>
 
+<!-- Winner Display -->
+<div class="card">
+  <h2>🎯 המנצח</h2>
+  <div id="winner-display" style="padding:20px 0;text-align:center;">
+    <div style="color:#aaa;font-size:15px;">טוען...</div>
+  </div>
+</div>
+
 <!-- Reset -->
 <div class="card">
   <h2>🗑️ Reset All Scores</h2>
@@ -162,12 +170,52 @@
   async function resetScores() {
     if (!confirm('Are you sure? This will delete ALL players and scores!')) return;
     const res = await fetch('/api/admin/reset', { method: 'POST' });
-    if (res.ok) alert('All scores have been reset.');
+    if (res.ok) {
+      alert('All scores have been reset.');
+      loadWinner();
+    }
+  }
+
+  async function loadWinner() {
+    try {
+      const res = await fetch('/api/admin/winner');
+      const data = await res.json();
+      const el = document.getElementById('winner-display');
+
+      if (!data.name) {
+        el.innerHTML = '<div style="color:#aaa;font-size:15px;">אין שחקנים עדיין</div>';
+        return;
+      }
+
+      if (data.perfect) {
+        el.innerHTML = `
+          <div style="font-size:48px;margin-bottom:12px;">🏆</div>
+          <div style="font-size:24px;font-weight:900;color:#16a34a;margin-bottom:8px;">${esc(data.name)}</div>
+          <div style="font-size:20px;font-weight:700;color:#16a34a;">200 נקודות - ציון מלא! 🎉</div>
+          <div style="font-size:13px;color:#888;margin-top:8px;">הראשון שענה על כל השאלות נכון</div>
+        `;
+      } else {
+        el.innerHTML = `
+          <div style="font-size:48px;margin-bottom:12px;">⭐</div>
+          <div style="font-size:24px;font-weight:900;color:#e84393;margin-bottom:8px;">${esc(data.name)}</div>
+          <div style="font-size:20px;font-weight:700;color:#e84393;">${data.score} נקודות</div>
+          <div style="font-size:13px;color:#888;margin-top:8px;">הציון הגבוה ביותר (עדיין אין ציון מלא)</div>
+        `;
+      }
+    } catch (err) {
+      console.error('Failed to load winner:', err);
+    }
   }
 
   const socket = io();
-  socket.on('leaderboard_update', renderBoard);
-  socket.on('connect', () => socket.emit('request_leaderboard'));
+  socket.on('leaderboard_update', (players) => {
+    renderBoard(players);
+    loadWinner();
+  });
+  socket.on('connect', () => {
+    socket.emit('request_leaderboard');
+    loadWinner();
+  });
 </script>
 </body>
 </html>

@@ -223,6 +223,44 @@ def leaderboard_api():
         return jsonify(leaderboard_data(conn))
 
 
+@app.route("/api/admin/winner")
+def get_winner():
+    """Get the first player with perfect score (200), or highest scorer if none."""
+    with get_db() as conn:
+        # First try to find the first player with 200 points
+        perfect = conn.execute("""
+            SELECT name, score, finished, created_at
+            FROM players
+            WHERE score = 200 AND finished = 1
+            ORDER BY created_at ASC
+            LIMIT 1
+        """).fetchone()
+
+        if perfect:
+            return jsonify({
+                "name": perfect["name"],
+                "score": perfect["score"],
+                "perfect": True
+            })
+
+        # Otherwise get the highest scorer
+        top = conn.execute("""
+            SELECT name, score, finished
+            FROM players
+            ORDER BY score DESC, created_at ASC
+            LIMIT 1
+        """).fetchone()
+
+        if top:
+            return jsonify({
+                "name": top["name"],
+                "score": top["score"],
+                "perfect": False
+            })
+
+        return jsonify({"name": None})
+
+
 # ── Socket.IO ────────────────────────────────────────────────────────────────
 
 @socketio.on("connect")
