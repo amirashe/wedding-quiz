@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>כניסה - ניהול חתונת מעיין ואמיר</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Rubik', sans-serif;
+      direction: rtl;
+      background: linear-gradient(160deg, #ffd6e7 0%, #c8b6ff 50%, #b8d3fe 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      color: #1e1e2e;
+    }
+    .card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 36px 28px;
+      box-shadow: 0 8px 32px rgba(0,0,0,.12);
+      width: 100%;
+      max-width: 360px;
+    }
+    h1 { font-size: 22px; font-weight: 900; text-align: center; margin-bottom: 6px; }
+    .sub { text-align: center; color: #555; margin-bottom: 28px; font-size: 14px; }
+    label { display: block; font-size: 14px; color: #555; margin-bottom: 6px; }
+    input[type=password] {
+      width: 100%; padding: 14px 16px;
+      font-size: 18px; font-family: 'Rubik', sans-serif;
+      border: 2px solid #e0e0e0; border-radius: 12px;
+      direction: ltr; text-align: center; letter-spacing: 4px;
+      outline: none; transition: border .2s;
+    }
+    input[type=password]:focus { border-color: #e84393; }
+    .btn {
+      display: block; width: 100%; margin-top: 16px;
+      padding: 14px; font-size: 17px; font-weight: 700;
+      font-family: 'Rubik', sans-serif;
+      background: linear-gradient(135deg, #e84393, #ff6fb8);
+      color: #fff; border: none; border-radius: 12px;
+      cursor: pointer; transition: opacity .2s;
+    }
+    .btn:hover { opacity: .9; }
+    .error {
+      margin-top: 14px;
+      padding: 12px;
+      background: #fff0f5;
+      border: 1px solid #ffc0d0;
+      border-radius: 10px;
+      color: #c0003c;
+      font-size: 14px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>⚙️ כניסה לניהול</h1>
+    <p class="sub">חתונת מעיין ואמיר</p>
+    <form method="POST">
+      <label for="password">סיסמא</label>
+      <input type="password" id="password" name="password" autofocus autocomplete="off" />
+      <button type="submit" class="btn">כניסה</button>
+    </form>
+    {% if error %}
+    <div class="error">סיסמא שגויה</div>
+    {% endif %}
+  </div>
+</body>
+</html>

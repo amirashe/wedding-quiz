@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 from flask_socketio import SocketIO, emit
 import sqlite3
 import secrets
@@ -98,8 +98,27 @@ def index():
     return render_template("index.html", total_questions=len(QUESTIONS))
 
 
+@app.route("/admin/login", methods=["GET", "POST"])
+def admin_login():
+    error = False
+    if request.method == "POST":
+        if request.form.get("password") == "280895":
+            session["admin"] = True
+            return redirect(url_for("admin"))
+        error = True
+    return render_template("admin_login.html", error=error)
+
+
+@app.route("/admin/logout")
+def admin_logout():
+    session.pop("admin", None)
+    return redirect(url_for("admin_login"))
+
+
 @app.route("/admin")
 def admin():
+    if not session.get("admin"):
+        return redirect(url_for("admin_login"))
     return render_template("admin.html")
 
 
